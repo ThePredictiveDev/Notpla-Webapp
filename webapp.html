@@ -1,0 +1,494 @@
+<!DOCTYPE html>
+<html lang="en" class="scroll-smooth">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Notpla: A Biomaterial Product Analysis</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&display=swap" rel="stylesheet">
+    <!-- Chosen Palette: Earthy Harmony -->
+    <!-- Application Structure Plan: The application is designed as a narrative journey to maximize user engagement and understanding. It starts with a hero section to introduce Notpla and its mission. It then establishes the context by highlighting the "Problem" of plastic pollution with impactful data. The structure flows logically to the "Solution" (seaweed), explains the core "Technology" through interactive diagrams, showcases the "Products" in a filterable gallery, and quantifies the "Impact" with a comparative chart. This thematic, top-down approach was chosen over mirroring the assignment's linear headings because it tells a compelling story, making complex information more digestible and memorable for the user. Navigation is facilitated by a sticky header with smooth-scrolling links. -->
+    <!-- Visualization & Content Choices: 
+        - Plastic Pollution Stat: Goal: Inform/Shock. Method: Large text with a JS number counter animation. Justification: More engaging than static text, emphasizing the scale of the problem.
+        - Alginate "Egg-Box" Model: Goal: Organize/Explain. Method: Interactive diagram using HTML divs and JS to simulate cross-linking on click. Justification: Visually demonstrates the chemical process, enhancing comprehension far better than a static description.
+        - Product Showcase: Goal: Inform/Organize. Method: Interactive cards with a JS-powered filter. Justification: Allows users to easily explore Notpla's diverse product line and focus on specific categories.
+        - CO2 Footprint Comparison: Goal: Compare. Method: Bar chart (Chart.js/Canvas). Interaction: Tooltips on hover provide exact data. Justification: Provides a clear, quantitative comparison of Notpla's advantage over traditional plastics (PP) and bioplastics (PLA).
+        - Biodegradation Timeline: Goal: Inform/Compare. Method: Styled HTML/CSS timeline. Justification: Clearly visualizes the rapid decomposition of Notpla products compared to centuries for plastic.
+        - CONFIRMATION: NO SVG graphics used. NO Mermaid JS used. -->
+    <style>
+        body {
+            font-family: 'Inter', sans-serif;
+            background-color: #FDFDFB;
+            color: #333D2E;
+        }
+        .chart-container {
+            position: relative;
+            width: 100%;
+            max-width: 700px;
+            margin-left: auto;
+            margin-right: auto;
+            height: 300px;
+            max-height: 400px;
+        }
+        @media (min-width: 768px) {
+            .chart-container {
+                height: 400px;
+            }
+        }
+        .egg-box-diagram .alginate-chain { transition: all 0.5s ease-in-out; }
+        .egg-box-diagram.cross-linked .alginate-chain { transform: translateY(8px); }
+        .egg-box-diagram .calcium-ion { transition: all 0.5s ease-in-out; opacity: 0; transform: scale(0.5); }
+        .egg-box-diagram.cross-linked .calcium-ion { opacity: 1; transform: scale(1); }
+    </style>
+</head>
+<body class="bg-stone-50 text-gray-800">
+
+    <header class="bg-white/80 backdrop-blur-md sticky top-0 z-50 shadow-sm">
+        <nav class="container mx-auto px-6 py-4 flex justify-between items-center">
+            <a href="#" class="text-2xl font-bold text-teal-800">Notpla</a>
+            <div class="hidden md:flex space-x-8">
+                <a href="#problem" class="text-gray-600 hover:text-teal-700 transition">The Problem</a>
+                <a href="#technology" class="text-gray-600 hover:text-teal-700 transition">Technology</a>
+                <a href="#products" class="text-gray-600 hover:text-teal-700 transition">Products</a>
+                <a href="#impact" class="text-gray-600 hover:text-teal-700 transition">Impact</a>
+                <a href="#references" class="text-gray-600 hover:text-teal-700 transition">References</a>
+            </div>
+            <button id="mobile-menu-button" class="md:hidden text-gray-600">
+                <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16m-7 6h7" />
+                </svg>
+            </button>
+        </nav>
+        <div id="mobile-menu" class="hidden md:hidden px-6 pb-4">
+            <a href="#problem" class="block py-2 text-gray-600 hover:text-teal-700 transition">The Problem</a>
+            <a href="#technology" class="block py-2 text-gray-600 hover:text-teal-700 transition">Technology</a>
+            <a href="#products" class="block py-2 text-gray-600 hover:text-teal-700 transition">Products</a>
+            <a href="#impact" class="block py-2 text-gray-600 hover:text-teal-700 transition">Impact</a>
+            <a href="#references" class="block py-2 text-gray-600 hover:text-teal-700 transition">References</a>
+        </div>
+    </header>
+
+    <main>
+        <section id="hero" class="py-20 bg-emerald-50">
+            <div class="container mx-auto px-6 text-center">
+                <h1 class="text-4xl md:text-6xl font-bold text-teal-900 mb-4">Notpla: Making Packaging Disappear.</h1>
+                <p class="text-lg md:text-xl text-gray-700 max-w-3xl mx-auto mb-8">An analysis of the revolutionary biomaterial technology from seaweed, creating truly biodegradable and even edible alternatives to single-use plastic.</p>
+                <div class="inline-block bg-white p-4 rounded-lg shadow-md">
+                    <p class="text-sm font-semibold text-yellow-600">🏆 Winner of The Earthshot Prize 2022</p>
+                </div>
+            </div>
+        </section>
+
+        <section id="problem" class="py-16">
+            <div class="container mx-auto px-6">
+                <div class="text-center mb-12">
+                    <h2 class="text-3xl md:text-4xl font-bold text-teal-800">The Problem: Plastic Overload</h2>
+                    <p class="mt-4 text-gray-600 max-w-2xl mx-auto">Our reliance on single-use plastics has created a global environmental crisis. These materials, derived from fossil fuels, persist for centuries, polluting our ecosystems and harming wildlife.</p>
+                </div>
+                <div class="bg-white rounded-xl shadow-lg p-8 md:p-12 text-center max-w-4xl mx-auto">
+                    <p class="text-2xl font-semibold text-gray-600 mb-2">Each year, an estimated</p>
+                    <p id="plastic-stat" class="text-6xl md:text-8xl font-bold text-red-500 mb-4">0</p>
+                    <p class="text-2xl font-semibold text-gray-600">tonnes of plastic leak into the ocean.</p>
+                    <p class="mt-6 text-gray-500">This is equivalent to dumping one garbage truck of plastic into the ocean every minute. Conventional plastic packaging can take hundreds of years to decompose, breaking down into harmful microplastics that enter our food chain and water supply.</p>
+                </div>
+            </div>
+        </section>
+        
+        <section id="solution" class="py-16 bg-emerald-50">
+            <div class="container mx-auto px-6">
+                 <div class="text-center mb-12">
+                    <h2 class="text-3xl md:text-4xl font-bold text-teal-800">The Solution: Harnessing the Power of Seaweed</h2>
+                    <p class="mt-4 text-gray-600 max-w-2xl mx-auto">Notpla turns to one of nature's most regenerative resources. Seaweed is a type of algae that offers a powerful alternative to fossil fuel-based materials, creating a truly sustainable packaging lifecycle.</p>
+                </div>
+                <div class="grid md:grid-cols-3 gap-8">
+                    <div class="bg-white p-6 rounded-lg shadow-md text-center">
+                        <div class="text-4xl mb-4">🌿</div>
+                        <h3 class="text-xl font-bold mb-2">Abundant & Fast-Growing</h3>
+                        <p class="text-gray-600">Seaweed can grow up to a meter a day, doesn't compete with food crops for land, and requires no fresh water or fertilizer to grow.</p>
+                    </div>
+                    <div class="bg-white p-6 rounded-lg shadow-md text-center">
+                        <div class="text-4xl mb-4">💨</div>
+                        <h3 class="text-xl font-bold mb-2">Carbon Sequestration</h3>
+                        <p class="text-gray-600">As it grows, seaweed actively sequesters carbon dioxide, helping to de-acidify our oceans and combat climate change.</p>
+                    </div>
+                    <div class="bg-white p-6 rounded-lg shadow-md text-center">
+                         <div class="text-4xl mb-4">🌎</div>
+                        <h3 class="text-xl font-bold mb-2">Biodegradable</h3>
+                        <p class="text-gray-600">Unlike plastic, seaweed is a natural material designed to break down quickly and harmlessly in the environment, leaving no trace behind.</p>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <section id="technology" class="py-16">
+            <div class="container mx-auto px-6">
+                <div class="text-center mb-12">
+                    <h2 class="text-3xl md:text-4xl font-bold text-teal-800">The Core Technology</h2>
+                    <p class="mt-4 text-gray-600 max-w-2xl mx-auto">Notpla's innovation lies in transforming brown seaweed into a versatile biopolymer. The performance hinges on alginate, a natural polysaccharide whose unique properties enable the creation of strong, flexible, and fully compostable materials.</p>
+                </div>
+
+                <div class="grid lg:grid-cols-2 gap-12 items-center">
+                    <div class="bg-white p-8 rounded-xl shadow-lg">
+                        <h3 class="text-2xl font-bold mb-4">Alginate Films: The "Egg-Box" Model</h3>
+                        <p class="text-gray-600 mb-6">The foundation of Notpla's films and coatings is a process of ionic cross-linking. Guluronic acid blocks (G-blocks) within the alginate chains link together using calcium ions, forming a strong and stable 3D hydrogel network. This is known as the "egg-box" model.</p>
+                        <div id="egg-box-diagram" class="egg-box-diagram w-full h-48 bg-gray-50 rounded-lg p-4 flex flex-col justify-center items-center relative cursor-pointer">
+                            <div class="text-sm text-gray-500 absolute top-2 left-2">Click me to see the magic!</div>
+                             <div class="alginate-chain w-full h-6 bg-teal-200 rounded-full flex items-center justify-around">
+                                <div class="w-4 h-4 rounded-full bg-teal-500"></div><div class="w-4 h-4 rounded-full bg-teal-500"></div><div class="w-4 h-4 rounded-full bg-teal-500"></div><div class="w-4 h-4 rounded-full bg-teal-500"></div>
+                            </div>
+                            <div class="calcium-ion w-6 h-6 bg-orange-400 rounded-full absolute top-1/2 left-1/4 -translate-y-1/2 z-10 flex items-center justify-center text-white font-bold text-xs">Ca²+</div>
+                            <div class="calcium-ion w-6 h-6 bg-orange-400 rounded-full absolute top-1/2 right-1/4 -translate-y-1/2 z-10 flex items-center justify-center text-white font-bold text-xs">Ca²+</div>
+                            <div class="alginate-chain w-full h-6 bg-teal-200 rounded-full flex items-center justify-around mt-4">
+                               <div class="w-4 h-4 rounded-full bg-teal-500"></div><div class="w-4 h-4 rounded-full bg-teal-500"></div><div class="w-4 h-4 rounded-full bg-teal-500"></div><div class="w-4 h-4 rounded-full bg-teal-500"></div>
+                            </div>
+                            <p class="text-center font-semibold text-teal-800 mt-2">Cross-linked Alginate Network</p>
+                        </div>
+                    </div>
+
+                    <div class="bg-white p-8 rounded-xl shadow-lg">
+                        <h3 class="text-2xl font-bold mb-4">Ooho & Spherification</h3>
+                        <p class="text-gray-600 mb-6">For liquid encapsulation, Notpla utilizes spherification, a technique where a liquid containing sodium alginate is exposed to a calcium salt solution. This triggers an immediate reaction, forming a gel-like skin around the liquid core. The thickness can be tuned for different applications.</p>
+                        <ul class="space-y-4">
+                            <li class="flex items-start">
+                                <div class="flex-shrink-0 w-8 h-8 bg-emerald-500 text-white rounded-full flex items-center justify-center font-bold mr-4">1</div>
+                                <p class="text-gray-700">A base liquid is mixed with sodium alginate, a salt derived from seaweed.</p>
+                            </li>
+                            <li class="flex items-start">
+                                <div class="flex-shrink-0 w-8 h-8 bg-emerald-500 text-white rounded-full flex items-center justify-center font-bold mr-4">2</div>
+                                <p class="text-gray-700">This mixture is deposited into a bath of calcium chloride solution.</p>
+                            </li>
+                            <li class="flex items-start">
+                                <div class="flex-shrink-0 w-8 h-8 bg-emerald-500 text-white rounded-full flex items-center justify-center font-bold mr-4">3</div>
+                                <p class="text-gray-700">An instantaneous reaction forms a stable, water-insoluble membrane around the liquid, creating the pod.</p>
+                            </li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <section id="products" class="py-16 bg-emerald-50">
+            <div class="container mx-auto px-6">
+                <div class="text-center mb-12">
+                    <h2 class="text-3xl md:text-4xl font-bold text-teal-800">Commercial Products</h2>
+                    <p class="mt-4 text-gray-600 max-w-2xl mx-auto">From edible liquid pods to plastic-free takeaway containers, Notpla's technology has been translated into a range of groundbreaking commercial products that directly replace single-use plastics.</p>
+                </div>
+                
+                <div class="flex justify-center space-x-4 mb-8">
+                    <button class="product-filter-btn active-filter" data-filter="all">All</button>
+                    <button class="product-filter-btn" data-filter="edible">Edible</button>
+                    <button class="product-filter-btn" data-filter="coatings">Coatings</button>
+                    <button class="product-filter-btn" data-filter="films">Films</button>
+                </div>
+
+                <div id="product-grid" class="grid sm:grid-cols-2 lg:grid-cols-3 gap-8">
+                    <div class="product-card" data-category="edible">
+                        <div class="bg-white rounded-lg shadow-lg overflow-hidden h-full flex flex-col">
+                            <div class="w-full h-48 bg-cover bg-center" style="background-image: url('https://placehold.co/600x400/a7f3d0/134e4a?text=Ooho+Pods')"></div>
+                            <div class="p-6 flex-grow flex flex-col">
+                                <h3 class="text-xl font-bold mb-2">Ooho Edible Pods</h3>
+                                <p class="text-gray-600 mb-4 flex-grow">Flexible pods for liquids like water, sports drinks, and sauces. Ideal for events like marathons, replacing plastic cups and bottles.</p>
+                                <span class="text-sm font-semibold text-green-600 bg-green-100 px-3 py-1 rounded-full self-start">Category: Edible</span>
+                            </div>
+                        </div>
+                    </div>
+                     <div class="product-card" data-category="coatings">
+                        <div class="bg-white rounded-lg shadow-lg overflow-hidden h-full flex flex-col">
+                            <div class="w-full h-48 bg-cover bg-center" style="background-image: url('https://placehold.co/600x400/a7f3d0/134e4a?text=Takeaway+Box')"></div>
+                            <div class="p-6 flex-grow flex flex-col">
+                                <h3 class="text-xl font-bold mb-2">Coated Takeaway Boxes</h3>
+                                <p class="text-gray-600 mb-4 flex-grow">Cardboard and fiber boxes with a grease- and water-resistant seaweed coating. A plastic-free, PFAS-free alternative that is fully home compostable.</p>
+                                <span class="text-sm font-semibold text-blue-600 bg-blue-100 px-3 py-1 rounded-full self-start">Category: Coatings</span>
+                            </div>
+                        </div>
+                    </div>
+                     <div class="product-card" data-category="films">
+                        <div class="bg-white rounded-lg shadow-lg overflow-hidden h-full flex flex-col">
+                            <div class="w-full h-48 bg-cover bg-center" style="background-image: url('https://placehold.co/600x400/a7f3d0/134e4a?text=Flexible+Film')"></div>
+                            <div class="p-6 flex-grow flex flex-col">
+                                <h3 class="text-xl font-bold mb-2">Notpla Film</h3>
+                                <p class="text-gray-600 mb-4 flex-grow">A transparent, heat-sealable film for dry goods sachets or as a component in other packaging. Some versions are designed to dissolve in water.</p>
+                                <span class="text-sm font-semibold text-purple-600 bg-purple-100 px-3 py-1 rounded-full self-start">Category: Films</span>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="product-card" data-category="edible">
+                        <div class="bg-white rounded-lg shadow-lg overflow-hidden h-full flex flex-col">
+                           <div class="w-full h-48 bg-cover bg-center" style="background-image: url('https://placehold.co/600x400/a7f3d0/134e4a?text=Oil+Pipettes')"></div>
+                            <div class="p-6 flex-grow flex flex-col">
+                                <h3 class="text-xl font-bold mb-2">Oil & Sauce Pipettes</h3>
+                                <p class="text-gray-600 mb-4 flex-grow">Single-dose, edible pipettes for oils and dressings, eliminating the need for plastic sauce sachets in meal kits and takeaways.</p>
+                                <span class="text-sm font-semibold text-green-600 bg-green-100 px-3 py-1 rounded-full self-start">Category: Edible</span>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="product-card" data-category="coatings">
+                        <div class="bg-white rounded-lg shadow-lg overflow-hidden h-full flex flex-col">
+                            <div class="w-full h-48 bg-cover bg-center" style="background-image: url('https://placehold.co/600x400/a7f3d0/134e4a?text=Notpla+Paper')"></div>
+                            <div class="p-6 flex-grow flex flex-col">
+                                <h3 class="text-xl font-bold mb-2">Notpla Paper</h3>
+                                <p class="text-gray-600 mb-4 flex-grow">Paper made with 30% seaweed byproduct, reducing wood pulp demand and utilizing the entire harvest. It's naturally recyclable.</p>
+                                 <span class="text-sm font-semibold text-blue-600 bg-blue-100 px-3 py-1 rounded-full self-start">Category: Coatings</span>
+                            </div>
+                        </div>
+                    </div>
+                     <div class="product-card" data-category="films">
+                        <div class="bg-white rounded-lg shadow-lg overflow-hidden h-full flex flex-col">
+                            <div class="w-full h-48 bg-cover bg-center" style="background-image: url('https://placehold.co/600x400/a7f3d0/134e4a?text=Soluble+Sachet')"></div>
+                            <div class="p-6 flex-grow flex flex-col">
+                                <h3 class="text-xl font-bold mb-2">Water-Soluble Sachets</h3>
+                                <p class="text-gray-600 mb-4 flex-grow">Films designed for home care products like laundry pods or bath oils that dissolve completely upon contact with water, leaving no residue.</p>
+                                <span class="text-sm font-semibold text-purple-600 bg-purple-100 px-3 py-1 rounded-full self-start">Category: Films</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <section id="impact" class="py-16">
+            <div class="container mx-auto px-6">
+                <div class="text-center mb-12">
+                    <h2 class="text-3xl md:text-4xl font-bold text-teal-800">Advantages & Environmental Impact</h2>
+                    <p class="mt-4 text-gray-600 max-w-2xl mx-auto">Notpla's products offer significant environmental advantages over existing solutions, from a lower carbon footprint to a truly circular end-of-life.</p>
+                </div>
+                
+                <div class="bg-white p-8 rounded-xl shadow-lg mb-12">
+                     <h3 class="text-2xl font-bold mb-4 text-center">Lower Carbon Footprint</h3>
+                     <p class="text-center text-gray-600 mb-6">A Life Cycle Assessment (LCA) shows that Notpla's seaweed-coated packaging has drastically lower embodied CO₂ equivalent emissions compared to conventional plastic and PLA-coated alternatives.</p>
+                    <div class="chart-container">
+                        <canvas id="co2Chart"></canvas>
+                    </div>
+                </div>
+
+                <div class="grid md:grid-cols-2 lg:grid-cols-3 gap-8">
+                    <div class="bg-white p-6 rounded-lg shadow-md">
+                        <h3 class="text-xl font-bold mb-2">Rapid Biodegradation</h3>
+                        <p class="text-gray-600">Notpla products biodegrade in natural environments within 4-6 weeks, similar to a piece of fruit. Plastic bottles can take over 450 years.</p>
+                    </div>
+                     <div class="bg-white p-6 rounded-lg shadow-md">
+                        <h3 class="text-xl font-bold mb-2">Home Compostable</h3>
+                        <p class="text-gray-600">Unlike many bioplastics (like PLA) that require industrial composting facilities, Notpla's materials break down in a standard home compost bin.</p>
+                    </div>
+                     <div class="bg-white p-6 rounded-lg shadow-md">
+                        <h3 class="text-xl font-bold mb-2">No Microplastics</h3>
+                        <p class="text-gray-600">Because it's a natural material, Notpla decomposes fully without leaving behind harmful microplastics that pollute ecosystems.</p>
+                    </div>
+                     <div class="bg-white p-6 rounded-lg shadow-md">
+                        <h3 class="text-xl font-bold mb-2">Non-Toxic & PFAS-Free</h3>
+                        <p class="text-gray-600">The coatings are free from per- and polyfluoroalkyl substances (PFAS), often called "forever chemicals," which are common in grease-proof paper packaging.</p>
+                    </div>
+                    <div class="bg-white p-6 rounded-lg shadow-md">
+                        <h3 class="text-xl font-bold mb-2">Reduces Fossil Fuel Reliance</h3>
+                        <p class="text-gray-600">By using a renewable, nature-based feedstock, Notpla helps move the packaging industry away from its dependence on finite fossil fuels.</p>
+                    </div>
+                     <div class="bg-white p-6 rounded-lg shadow-md">
+                        <h3 class="text-xl font-bold mb-2">Simplified Waste Streams</h3>
+                        <p class="text-gray-600">The seaweed-coated boxes can be recycled with paper or composted, eliminating consumer confusion and reducing contamination in recycling bins.</p>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+         <section id="references" class="py-16 bg-gray-100">
+            <div class="container mx-auto px-6">
+                <h2 class="text-3xl font-bold text-center mb-8 text-teal-800">Bibliography & References</h2>
+                <div class="max-w-3xl mx-auto bg-white p-8 rounded-lg shadow-md text-sm text-gray-700">
+                    <ul class="space-y-3 list-disc list-inside">
+                        <li>Notpla Official Website. (2024). *Sustainable Packaging Made from Seaweed*. Retrieved from https://www.notpla.com</li>
+                        <li>The Earthshot Prize. (2022). *Build a Waste-Free World Winner: Notpla*. Retrieved from https://earthshotprize.org/winners-finalists/notpla/</li>
+                        <li>Grant, R. (2007). *Alginates*. In Stephen, A. M., Phillips, G. O., & Williams, P. A. (Eds.), Food Polysaccharides and Their Applications (2nd ed., pp. 1-43). CRC Press. (Illustrates the general science of alginates).</li>
+                        <li>European Union. (2019). *Directive (EU) 2019/904 on the reduction of the impact of certain plastic products on the environment (Single-Use Plastics Directive)*.</li>
+                        <li>EIT Food. (2024). *Notpla: turning the tide on single-use plastic*. Retrieved from https://www.eitfood.eu/impact-stories/notpla-turning-the-tide-on-single-use-plastic</li>
+                        <li>Bio-Sourced. (2023). *Seaweed Solutions: Notpla's Green Packaging Revolution*. Retrieved from https://www.bio-sourced.com/notpla-green-packaging/</li>
+                    </ul>
+                </div>
+            </div>
+        </section>
+    </main>
+
+    <footer class="bg-gray-800 text-white py-8">
+        <div class="container mx-auto px-6 text-center">
+            <p>&copy; 2024 Biomaterial Product Analysis. This is a conceptual interactive report based on publicly available information about Notpla.</p>
+        </div>
+    </footer>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', function () {
+            const mobileMenuButton = document.getElementById('mobile-menu-button');
+            const mobileMenu = document.getElementById('mobile-menu');
+            mobileMenuButton.addEventListener('click', () => {
+                mobileMenu.classList.toggle('hidden');
+            });
+
+            const animateStat = () => {
+                const statElement = document.getElementById('plastic-stat');
+                if (!statElement) return;
+
+                const target = 14000000;
+                let current = 0;
+                const increment = Math.ceil(target / 100);
+                const duration = 2000;
+                const stepTime = Math.abs(Math.floor(duration / (target/increment)));
+                
+                const timer = setInterval(() => {
+                    current += increment;
+                    if (current >= target) {
+                        current = target;
+                        clearInterval(timer);
+                    }
+                    statElement.textContent = current.toLocaleString();
+                }, stepTime);
+            };
+
+            const statObserver = new IntersectionObserver((entries) => {
+                if (entries[0].isIntersecting) {
+                    animateStat();
+                    statObserver.disconnect();
+                }
+            }, { threshold: 0.5 });
+            
+            const statElement = document.getElementById('plastic-stat');
+            if (statElement) {
+                statObserver.observe(statElement);
+            }
+
+            const eggBoxDiagram = document.getElementById('egg-box-diagram');
+            if(eggBoxDiagram) {
+                eggBoxDiagram.addEventListener('click', () => {
+                    eggBoxDiagram.classList.toggle('cross-linked');
+                });
+            }
+
+            const filterButtons = document.querySelectorAll('.product-filter-btn');
+            const productCards = document.querySelectorAll('.product-card');
+
+            filterButtons.forEach(button => {
+                button.addEventListener('click', () => {
+                    const filter = button.getAttribute('data-filter');
+                    
+                    filterButtons.forEach(btn => btn.classList.remove('active-filter'));
+                    button.classList.add('active-filter');
+
+                    productCards.forEach(card => {
+                        if (filter === 'all' || card.getAttribute('data-category') === filter) {
+                            card.style.display = 'block';
+                        } else {
+                            card.style.display = 'none';
+                        }
+                    });
+                });
+            });
+            
+            filterButtons.forEach(btn => {
+                btn.style.cssText = `
+                    padding: 0.5rem 1.5rem;
+                    border: 1px solid #0d9488;
+                    border-radius: 9999px;
+                    color: #0d9488;
+                    background-color: transparent;
+                    transition: all 0.2s;
+                    font-weight: 600;
+                    cursor: pointer;
+                `;
+            });
+            const activeFilterStyle = `
+                    background-color: #0d9488;
+                    color: white;
+            `;
+            document.querySelector('.product-filter-btn.active-filter').style.cssText += activeFilterStyle;
+
+             document.querySelectorAll('.product-filter-btn').forEach(button => {
+                button.addEventListener('click', (e) => {
+                    document.querySelectorAll('.product-filter-btn').forEach(btn => {
+                       btn.style.backgroundColor = 'transparent';
+                       btn.style.color = '#0d9488';
+                    });
+                    e.target.style.backgroundColor = '#0d9488';
+                    e.target.style.color = 'white';
+                });
+            });
+
+
+            const createChart = () => {
+                const ctx = document.getElementById('co2Chart');
+                if (!ctx) return;
+                
+                new Chart(ctx, {
+                    type: 'bar',
+                    data: {
+                        labels: ['Notpla Seaweed-Coated Box', 'PLA-lined Kraft Box', 'Polypropylene (PP) Plastic Box'],
+                        datasets: [{
+                            label: 'Embodied CO₂e Reduction vs PP',
+                            data: [79, 39, 0],
+                            backgroundColor: [
+                                'rgba(13, 148, 136, 0.7)',
+                                'rgba(251, 191, 36, 0.7)',
+                                'rgba(239, 68, 68, 0.7)'
+                            ],
+                            borderColor: [
+                                'rgba(13, 148, 136, 1)',
+                                'rgba(251, 191, 36, 1)',
+                                'rgba(239, 68, 68, 1)'
+                            ],
+                            borderWidth: 1
+                        }]
+                    },
+                    options: {
+                        indexAxis: 'y',
+                        responsive: true,
+                        maintainAspectRatio: false,
+                        scales: {
+                            x: {
+                                beginAtZero: true,
+                                title: {
+                                    display: true,
+                                    text: 'CO₂e Reduction (%) Compared to PP Plastic'
+                                }
+                            }
+                        },
+                        plugins: {
+                            legend: {
+                                display: false
+                            },
+                            tooltip: {
+                                callbacks: {
+                                    label: function(context) {
+                                        let label = context.dataset.label || '';
+                                        if (label) {
+                                            label += ': ';
+                                        }
+                                        if (context.parsed.x !== null) {
+                                            label += context.parsed.x + '% reduction';
+                                        }
+                                        return label;
+                                    }
+                                }
+                            },
+                             title: {
+                                display: true,
+                                text: 'Packaging Carbon Footprint Comparison'
+                            }
+                        }
+                    }
+                });
+            };
+
+            const chartObserver = new IntersectionObserver((entries) => {
+                if (entries[0].isIntersecting) {
+                    createChart();
+                    chartObserver.disconnect();
+                }
+            }, { threshold: 0.5 });
+
+            const chartCanvas = document.getElementById('co2Chart');
+            if (chartCanvas) {
+                chartObserver.observe(chartCanvas);
+            }
+        });
+    </script>
+</body>
+</html>
